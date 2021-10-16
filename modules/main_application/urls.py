@@ -17,6 +17,7 @@ urlpatterns = [
     path('get_specific_plan/',views.get_specific_plan),
     path('create_subscription/',views.create_subscription),
     path('get_specific_subscription/',views.get_specific_subscription),
-    path('update_subscription/',views.update_subscription)
+    path('update_subscription/',views.update_subscription),
+    path('get_all_subscriptions/',views.get_all_subscriptions)
 
 ]

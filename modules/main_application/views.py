@@ -12,7 +12,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.schemas.openapi import AutoSchema
 from rest_framework.views import APIView
 from .models import application,plan,subscription
-from .serializer import application_serializer, plan_serializer, subscription_serializer
+from .serializer import application_serializer, plan_serializer, subscription_serializer, subscription_serializer_again
 
 
 # Create your views here.
@@ -192,7 +192,7 @@ def delete_application(request):
 
 
 @swagger_auto_schema(method='get',
-                responses={200: application_serializer,400: 'Bad Request'})
+                responses={200: plan_serializer,400: 'Bad Request'})
 @api_view(["GET"])
 @authentication_classes([TokenAuthentication,SessionAuthentication])
 @permission_classes([IsAuthenticated])
@@ -209,7 +209,7 @@ def get_all_plans(request):
 
 @swagger_auto_schema(method='get',
                 manual_parameters=[openapi.Parameter('id', openapi.IN_QUERY, description="id of plan", type=openapi.TYPE_INTEGER)],
-                responses={200: application_serializer,400: 'Bad Request'})
+                responses={200: plan_serializer,400: 'Bad Request'})
 @api_view(["GET"])
 @authentication_classes([TokenAuthentication,SessionAuthentication])
 @permission_classes([IsAuthenticated])
@@ -232,7 +232,7 @@ def get_specific_plan(request):
         'status':openapi.Schema(type=openapi.TYPE_BOOLEAN, description='active or stopped'),
 
     },required=['plan','app','active']),
-    responses={200: 'application created successfully',400: 'Bad Request'})
+    responses={200: 'subscription created successfully',400: 'Bad Request'})
 @api_view(["POST"])
 @authentication_classes([TokenAuthentication,SessionAuthentication])
 @permission_classes([IsAuthenticated])
@@ -240,7 +240,7 @@ def create_subscription(request):
     try:
         plan_id=request.data['plan']
         application_id=request.data['app']
-        status=request.data['active']
+        status=request.data['status']
 
         plan_to_get=plan.objects.get(id=plan_id)
         application_to_get=application.objects.get(id=application_id)
@@ -261,7 +261,7 @@ def create_subscription(request):
 
 @swagger_auto_schema(method='get',
                 manual_parameters=[openapi.Parameter('id', openapi.IN_QUERY, description="id of subscription", type=openapi.TYPE_INTEGER)],
-                responses={200: application_serializer,400: 'Bad Request'})
+                responses={200: subscription_serializer_again,400: 'Bad Request'})
 @api_view(["GET"])
 @authentication_classes([TokenAuthentication,SessionAuthentication])
 @permission_classes([IsAuthenticated])
@@ -269,7 +269,7 @@ def get_specific_subscription(request):
     try:
         id_of_plan=request.GET.get('id')
         subscription_to_retrieve=subscription.objects.get(id=id_of_plan)
-        serialized = subscription_serializer(instance=subscription_to_retrieve)
+        serialized = subscription_serializer_again(instance=subscription_to_retrieve)
         response_object = {}
         meta = {"code": 1000, "message": "subscription retrieved successfully"}
         data = {}
@@ -289,7 +289,7 @@ def get_specific_subscription(request):
 
                          }),
                         required=['plan','app','active'],
-                responses={200: application_serializer,400: 'Bad Request'})
+                responses={200: subscription_serializer_again,400: 'Bad Request'})
 @api_view(["PUT"])
 @authentication_classes([TokenAuthentication,SessionAuthentication])
 @permission_classes([IsAuthenticated])
@@ -335,3 +335,18 @@ def update_subscription(request):
 
     except BaseException as e:
         raise ValidationError({"error":str(e)})
+
+@swagger_auto_schema(method='get',
+                responses={200: subscription_serializer_again,400: 'Bad Request'})
+@api_view(["GET"])
+@authentication_classes([TokenAuthentication,SessionAuthentication])
+@permission_classes([IsAuthenticated])
+def get_all_subscriptions(request):
+    all_subs=subscription.objects.filter(user=request.user)
+    serialized=subscription_serializer_again(instance=all_subs,many=True)
+    response_object = {}
+    meta = {"code": 1000, "message": "all subscriptions listed"}
+    data = {}
+    response_object['meta'] = meta
+    response_object['data'] = serialized.data
+    return Response(response_object)
