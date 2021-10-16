@@ -20,6 +20,7 @@ class plan_serializer(ModelSerializer):
         fields='__all__'
 
 class subscription_serializer_again(ModelSerializer):
+    plan=plan_serializer()
     class Meta:
         model=subscription
         fields='__all__'
