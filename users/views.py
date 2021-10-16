@@ -15,9 +15,6 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import api_view, permission_classes, authentication_classes, renderer_classes, schema
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.authtoken.models import Token
-from rest_framework.routers import DefaultRouter
-from rest_framework.schemas import AutoSchema, ManualSchema
-from rest_framework_swagger import renderers
 
 @api_view(['POST'])
 @authentication_classes([TokenAuthentication])
