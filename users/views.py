@@ -24,9 +24,9 @@ from rest_framework.authtoken.models import Token
 @swagger_auto_schema(method='post', request_body=openapi.Schema(
     type=openapi.TYPE_OBJECT,
     properties={
-        'email': openapi.Schema(type=openapi.TYPE_INTEGER, description='email of user'),
-        'password':openapi.Schema(type=openapi.TYPE_INTEGER, description='password of user'),
-        'password_again':openapi.Schema(type=openapi.TYPE_BOOLEAN, description='password again'),
+        'email': openapi.Schema(type=openapi.TYPE_STRING, description='email of user'),
+        'password':openapi.Schema(type=openapi.TYPE_STRING, description='password of user'),
+        'password_again':openapi.Schema(type=openapi.TYPE_STRING, description='password again'),
 
     },required=['email','password','password_again']),
     responses={200: 'application created successfully',400: 'Bad Request'})
@@ -74,8 +74,8 @@ def Registeration(request):
 @swagger_auto_schema(method='post', request_body=openapi.Schema(
     type=openapi.TYPE_OBJECT,
     properties={
-        'email': openapi.Schema(type=openapi.TYPE_INTEGER, description='email of user'),
-        'password':openapi.Schema(type=openapi.TYPE_INTEGER, description='password of user'),
+        'email': openapi.Schema(type=openapi.TYPE_STRING, description='email of user'),
+        'password':openapi.Schema(type=openapi.TYPE_STRING, description='password of user'),
 
 
     },required=['email','password']),

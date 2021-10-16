@@ -260,22 +260,24 @@ def create_subscription(request):
 
 
 @swagger_auto_schema(method='get',
-                manual_parameters=[openapi.Parameter('id', openapi.IN_QUERY, description="id of plan", type=openapi.TYPE_INTEGER)],
+                manual_parameters=[openapi.Parameter('id', openapi.IN_QUERY, description="id of subscription", type=openapi.TYPE_INTEGER)],
                 responses={200: application_serializer,400: 'Bad Request'})
 @api_view(["GET"])
 @authentication_classes([TokenAuthentication,SessionAuthentication])
 @permission_classes([IsAuthenticated])
 def get_specific_subscription(request):
-    id_of_plan=request.GET.get('id')
-    subscription_to_retrieve=subscription.objects.get(id=id_of_plan)
-    serialized = subscription_serializer(instance=subscription_to_retrieve)
-    response_object = {}
-    meta = {"code": 1000, "message": "plan listed"}
-    data = {}
-    response_object['meta'] = meta
-    response_object['data'] = serialized.data
-    return Response(response_object)
-
+    try:
+        id_of_plan=request.GET.get('id')
+        subscription_to_retrieve=subscription.objects.get(id=id_of_plan)
+        serialized = subscription_serializer(instance=subscription_to_retrieve)
+        response_object = {}
+        meta = {"code": 1000, "message": "subscription retrieved successfully"}
+        data = {}
+        response_object['meta'] = meta
+        response_object['data'] = serialized.data
+        return Response(response_object)
+    except BaseException as e:
+        raise ValidationError({"error":str(e)})
 @swagger_auto_schema(method='put',
                 manual_parameters=[openapi.Parameter('id', openapi.IN_QUERY, description="id of subscription", type=openapi.TYPE_INTEGER)],
                 request_body=openapi.Schema(
