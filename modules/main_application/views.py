@@ -119,7 +119,7 @@ def get_all_applications(request):
 
 
                          }),
-                        required=['name','description'],
+
                 responses={200: application_serializer,400: 'Bad Request'})
 @api_view(["PUT"])
 @authentication_classes([TokenAuthentication,SessionAuthentication])
@@ -287,8 +287,8 @@ def get_specific_subscription(request):
                              'app': openapi.Schema(type=openapi.TYPE_INTEGER, description='id of app'),
                              'active':openapi.Schema(type=openapi.TYPE_BOOLEAN, description='status of app')
 
-                         }),
-                        required=['plan','app','active'],
+                         },required=['plan','app','active']),
+
                 responses={200: subscription_serializer_again,400: 'Bad Request'})
 @api_view(["PUT"])
 @authentication_classes([TokenAuthentication,SessionAuthentication])
