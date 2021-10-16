@@ -1,9 +1,109 @@
+import json
+import coreapi, coreschema
+from django.contrib.auth.hashers import check_password
+from rest_framework import renderers
+
+from .models import User
+from django.shortcuts import render
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
 from django.views.generic import DetailView, RedirectView, UpdateView
+from rest_framework.exceptions import ValidationError
+from rest_framework.response import Response
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.decorators import api_view, permission_classes, authentication_classes, renderer_classes, schema
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
+from rest_framework.authtoken.models import Token
+from rest_framework.routers import DefaultRouter
+from rest_framework.schemas import AutoSchema, ManualSchema
+from rest_framework_swagger import renderers
 
-User = get_user_model()
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([AllowAny])
+def Registeration(request):
+
+    reqBody=json.loads(request.body)
+    email=reqBody['email']
+    password=reqBody['password']
+    password_again=reqBody['password_again']
+    if password!=password_again:
+        response_object = {}
+        meta = {"code": 400, "message": "failure"}
+
+        response_object['meta'] = meta
+        response_object['data'] = 'passwords donot match'
+
+    used=User.objects.get_or_create(email=email)
+    if used[1]==False:
+        response_object = {}
+        meta = {"code": 400, "message": "failure"}
+
+        response_object['meta'] = meta
+        response_object['data'] = 'User already exists'
+
+
+    else:
+        used[0].set_password(password)
+        used[0].username=email
+        toke=Token.objects.create(user=used[0]).key
+        used[0].save()
+
+    response_object = {}
+    meta = {"code": 1000, "message": "success"}
+    data = {}
+    data['message'] = 'User Registered Successfully'
+    data['email_address'] = used[0].email
+    data['Token'] = toke
+    response_object['meta'] = meta
+    response_object['data'] = data
+    return Response(response_object)
+
+
+@api_view(["POST"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([AllowAny])
+def login_user(request):
+    data = {}
+    reqBody = json.loads(request.body)
+    email1 = reqBody['email']
+
+    password = reqBody['password']
+    try:
+
+        Account = User.objects.get(email=email1)
+
+    except BaseException as e:
+        raise ValidationError({"Error": f'{str(e)}'})
+
+    token = Token.objects.get_or_create(user=Account)[0].key
+
+    if not check_password(password, Account.password):
+        raise ValidationError({"message": "Incorrect Login credentials"})
+
+    if Account:
+        if Account.is_active:
+
+            data["message"] = "user logged in"
+            data["email_address"] = Account.email
+            data['id'] = Account.id
+            data['token']=token
+            response_object = {}
+            meta = {"code": 1000, "message": "success"}
+            response_object['meta'] = meta
+            response_object['data'] = data
+
+            return Response(response_object)
+
+        else:
+            raise ValidationError({"Error": f'Account not active'})
+
+    else:
+        raise ValidationError({"Error": f'Account doesnt exist'})
+
+
+
 
 
 class UserDetailView(LoginRequiredMixin, DetailView):

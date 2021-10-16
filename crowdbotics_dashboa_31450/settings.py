@@ -13,12 +13,25 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 import os
 import environ
 import logging
+from django.apps import AppConfig
 from modules.manifest import get_modules
 
 env = environ.Env()
+AppConfig.default = False
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+
+
+    ]
+}
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env.bool("DEBUG", default=False)
+DEBUG = env.bool("DEBUG", default=True)
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -28,10 +41,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env.str("SECRET_KEY")
-
-ALLOWED_HOSTS = env.list("HOST", default=["*"])
+# SECRET_KEY = env.str("SECRET_KEY")
+# ALLOWED_HOSTS = env.list("HOST", default=["*"])
 SITE_ID = 1
+
+SECRET_KEY = ['what']
+ALLOWED_HOSTS = ['127.0.0.1']
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SECURE_SSL_REDIRECT = env.bool("SECURE_REDIRECT", default=False)
@@ -66,7 +81,8 @@ THIRD_PARTY_APPS = [
     'drf_yasg',
     'storages',
 ]
-MODULES_APPS = get_modules()
+# MODULES_APPS = get_modules()
+MODULES_APPS=['modules.main_application']
 
 INSTALLED_APPS += LOCAL_APPS + THIRD_PARTY_APPS + MODULES_APPS
 
