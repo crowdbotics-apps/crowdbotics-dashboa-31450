@@ -13,3 +13,8 @@ class plan_serializer(ModelSerializer):
     class Meta:
         model=plan
         fields='__all__'
+
+class subscription_serializer(ModelSerializer):
+    class Meta:
+        model=subscription
+        fields='__all__'

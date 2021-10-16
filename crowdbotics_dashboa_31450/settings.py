@@ -45,7 +45,6 @@ SECRET_KEY = env.str("SECRET_KEY")
 ALLOWED_HOSTS = env.list("HOST", default=["*"])
 SITE_ID = 1
 
-
 # SECRET_KEY = ['what']
 # ALLOWED_HOSTS = ['127.0.0.1']
 

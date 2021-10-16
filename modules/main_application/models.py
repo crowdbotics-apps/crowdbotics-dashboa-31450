@@ -21,7 +21,7 @@ class plan(models.Model):
 
 class subscription(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='user_subscription')
-    plan=models.OneToOneField(plan, on_delete=models.CASCADE, null=True, blank=True, related_name='plan_subscription')
+    plan=models.ForeignKey(plan, on_delete=models.CASCADE, null=True, blank=True, related_name='plan_subscription')
     application = models.OneToOneField(application, on_delete=models.CASCADE, null=True, blank=True,
                                     related_name='app_subscription')
     active=models.BooleanField(default=False)
