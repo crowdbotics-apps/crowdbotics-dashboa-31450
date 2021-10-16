@@ -23,8 +23,12 @@ from .serializer import application_serializer, plan_serializer, subscription_se
     properties={
         'name': openapi.Schema(type=openapi.TYPE_STRING, description='name of application'),
         'description':openapi.Schema(type=openapi.TYPE_STRING, description='description'),
+        'type':openapi.Schema(type=openapi.TYPE_STRING, description='type'),
+        'framework':openapi.Schema(type=openapi.TYPE_STRING, description='framework'),
 
-    },required=['name','description']),
+
+
+    },required=['name','description','framework','type']),
     responses={200: 'application created successfully',400: 'Bad Request'})
 @api_view(["POST"])
 @authentication_classes([TokenAuthentication,SessionAuthentication])
@@ -35,14 +39,16 @@ def create_application(request):
         reqBody = request.data
         name=reqBody['name']
         description=reqBody['description']
+        framework=reqBody['framework']
+        type = reqBody['type']
         application_to_create=application.objects.create(user=request.user,
-                                                                name=name,description=description)
+                                                                name=name,description=description,
+                                                        type=type,framework=framework )
         response_object = {}
         meta = {"code": 1000, "message": "application created successfully"}
-        data = {}
-        data['application_id']=application_to_create.id
+        serialized=application_serializer(instance=application_to_create)
         response_object['meta'] = meta
-        response_object['data'] = data
+        response_object['data'] = serialized.data
         return Response(response_object)
 
     except BaseException as e:
@@ -108,6 +114,9 @@ def get_all_applications(request):
                          properties={
                              'name': openapi.Schema(type=openapi.TYPE_STRING, description='name of application'),
                              'description': openapi.Schema(type=openapi.TYPE_STRING, description='description'),
+                            'framework': openapi.Schema(type=openapi.TYPE_STRING, description='framework'),
+                            'type': openapi.Schema(type=openapi.TYPE_STRING, description='type'),
+
 
                          }),
                         required=['name','description'],
@@ -129,6 +138,16 @@ def update_application(request):
             application_to_get.description = request.data['description']
             application_to_get.save()
 
+        if 'framework' in request.data.keys():
+            application_to_get = application.objects.get(id=id_number)
+            application_to_get.framework = request.data['framework']
+            application_to_get.save()
+
+        if 'type' in request.data.keys():
+            application_to_get = application.objects.get(id=id_number)
+            application_to_get.type = request.data['type']
+            application_to_get.save()
+
         else:
             return Response('You didnot provide any value to change')
 
@@ -146,18 +165,18 @@ def update_application(request):
         raise ValidationError({"error":str(e)})
 
 @swagger_auto_schema(method='delete',
-                manual_parameters=[openapi.Parameter('name', openapi.IN_QUERY, description="name of application", type=openapi.TYPE_STRING)],
+                manual_parameters=[openapi.Parameter('id', openapi.IN_QUERY, description="id of application", type=openapi.TYPE_STRING)],
                 responses={200: application_serializer,400: 'Bad Request'})
 @api_view(["DELETE"])
 @authentication_classes([TokenAuthentication,SessionAuthentication])
 @permission_classes([IsAuthenticated])
 def delete_application(request):
     try:
-        name_application=request.GET.get('name')
+        name_application=request.GET.get('id')
         print(name_application)
 
 
-        application_to_get = application.objects.get(user=request.user,name=name_application)
+        application_to_get = application.objects.get(id=name_application)
         application_to_get.delete()
 
 
@@ -231,7 +250,7 @@ def create_subscription(request):
 
         serialized = subscription_serializer(instance=subscription_to_create)
         response_object = {}
-        meta = {"code": 1000, "message": "plan listed"}
+        meta = {"code": 1000, "message": "subscription created"}
         data = {}
         response_object['meta'] = meta
         response_object['data'] = serialized.data
@@ -258,7 +277,7 @@ def get_specific_subscription(request):
     return Response(response_object)
 
 @swagger_auto_schema(method='put',
-                manual_parameters=[openapi.Parameter('id', openapi.IN_QUERY, description="id of application", type=openapi.TYPE_INTEGER)],
+                manual_parameters=[openapi.Parameter('id', openapi.IN_QUERY, description="id of subscription", type=openapi.TYPE_INTEGER)],
                 request_body=openapi.Schema(
                          type=openapi.TYPE_OBJECT,
                          properties={
@@ -267,7 +286,7 @@ def get_specific_subscription(request):
                              'active':openapi.Schema(type=openapi.TYPE_BOOLEAN, description='status of app')
 
                          }),
-                        required=['name','description'],
+                        required=['plan','app','active'],
                 responses={200: application_serializer,400: 'Bad Request'})
 @api_view(["PUT"])
 @authentication_classes([TokenAuthentication,SessionAuthentication])

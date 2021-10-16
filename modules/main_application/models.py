@@ -7,6 +7,8 @@ class application(models.Model):
     user=models.ForeignKey(User,on_delete=models.CASCADE,null=True,blank=True,related_name='application')
     name=models.CharField(max_length=264,null=True,blank=True,unique=True)
     description=models.TextField(max_length=100,null=True,blank=True)
+    type=models.CharField(max_length=100,null=True,blank=True)
+    framework=models.CharField(max_length=100,null=True,blank=True)
     updated_at=models.DateTimeField(auto_now=True)
 
 
@@ -15,7 +17,7 @@ plan_choices=(('Free','Free'),('Standard','Standard'),('Pro','Pro'))
 class plan(models.Model):
     type_of_plan=models.CharField(max_length=264,null=True,blank=True,choices=plan_choices)
     price=models.IntegerField(null=True,blank=True)
-    updated_at=models.DateTimeField(auto_now=True)
+    created_at=models.DateTimeField(auto_now=True)
 
 
 

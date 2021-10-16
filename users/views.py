@@ -1,6 +1,8 @@
 import json
 import coreapi, coreschema
 from django.contrib.auth.hashers import check_password
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import renderers
 
 from .models import User
@@ -16,15 +18,27 @@ from rest_framework.decorators import api_view, permission_classes, authenticati
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.authtoken.models import Token
 
+
+
+
+@swagger_auto_schema(method='post', request_body=openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'email': openapi.Schema(type=openapi.TYPE_INTEGER, description='email of user'),
+        'password':openapi.Schema(type=openapi.TYPE_INTEGER, description='password of user'),
+        'password_again':openapi.Schema(type=openapi.TYPE_BOOLEAN, description='password again'),
+
+    },required=['email','password','password_again']),
+    responses={200: 'application created successfully',400: 'Bad Request'})
 @api_view(['POST'])
 @authentication_classes([TokenAuthentication])
 @permission_classes([AllowAny])
 def Registeration(request):
 
-    reqBody=json.loads(request.body)
-    email=reqBody['email']
-    password=reqBody['password']
-    password_again=reqBody['password_again']
+
+    email=request.data['email']
+    password=request.data['password']
+    password_again=request.data['password_again']
     if password!=password_again:
         response_object = {}
         meta = {"code": 400, "message": "failure"}
@@ -57,13 +71,21 @@ def Registeration(request):
     response_object['data'] = data
     return Response(response_object)
 
+@swagger_auto_schema(method='post', request_body=openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'email': openapi.Schema(type=openapi.TYPE_INTEGER, description='email of user'),
+        'password':openapi.Schema(type=openapi.TYPE_INTEGER, description='password of user'),
 
+
+    },required=['email','password']),
+    responses={200: 'application created successfully',400: 'Bad Request'})
 @api_view(["POST"])
 @authentication_classes([TokenAuthentication])
 @permission_classes([AllowAny])
 def login_user(request):
     data = {}
-    reqBody = json.loads(request.body)
+    reqBody = request.data
     email1 = reqBody['email']
 
     password = reqBody['password']
