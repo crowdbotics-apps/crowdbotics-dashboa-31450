@@ -45,6 +45,7 @@ def Registeration(request):
 
         response_object['meta'] = meta
         response_object['data'] = 'passwords donot match'
+        return Response(response_object)
 
     used=User.objects.get_or_create(email=email)
     if used[1]==False:
@@ -53,6 +54,7 @@ def Registeration(request):
 
         response_object['meta'] = meta
         response_object['data'] = 'User already exists'
+        return Response(response_object)
 
 
     else:
