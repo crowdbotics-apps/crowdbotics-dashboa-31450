@@ -29,7 +29,7 @@ from rest_framework.authtoken.models import Token
         'password_again':openapi.Schema(type=openapi.TYPE_STRING, description='password again'),
 
     },required=['email','password','password_again']),
-    responses={200: 'application created successfully',400: 'Bad Request'})
+    responses={200: 'User created successfully',400: 'Bad Request'})
 @api_view(['POST'])
 @authentication_classes([TokenAuthentication])
 @permission_classes([AllowAny])
@@ -79,7 +79,7 @@ def Registeration(request):
 
 
     },required=['email','password']),
-    responses={200: 'application created successfully',400: 'Bad Request'})
+    responses={200: 'User Logged in successfully',400: 'Bad Request'})
 @api_view(["POST"])
 @authentication_classes([TokenAuthentication])
 @permission_classes([AllowAny])
